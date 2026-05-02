@@ -53,6 +53,7 @@ Important constraint for the next implementation pass:
 - Phase 7 is now functionally complete, including admin authentication, protected admin pages, product management, order review, payment event review, and audit logging for admin-side mutations.
 - Phase 8 is now functionally complete, including unit tests, DB-backed integration workflow tests, index verification, updated local development documentation, and a repeatable sandbox drill script.
 - The next implementation pass should move into Phase 9 so the remaining polish, version-1 limitations, and MVP handoff concerns can be tightened around the now-working flows.
+- The remaining work is now less about missing core features and more about product readiness, so the next sessions should avoid broad refactors and instead prioritize UX friction, operational clarity, and deployment-facing documentation in a controlled order.
 - Local sandbox payment testing now depends on the `npm run dev:tunnel` helper so ToyyibPay can reach a public callback URL during development.
 
 ## Implementation Plan
@@ -160,6 +161,91 @@ Execution notes:
 - [ ] Document known limitations for version 1, including guest checkout constraints and manual admin reconciliation boundaries.
 - [ ] Prepare the project for the next phase of work, including deployment setup or local homelab hosting.
 
+Execution notes:
+- Treat Phase 9 as a sequence of narrow polish passes instead of one large mixed session so testing and visual review stay manageable.
+- Prefer small UX and copy improvements that reduce buyer or admin confusion without changing the validated checkout, payment, and fulfillment invariants from Phases 5 through 8.
+- Re-run `npm run test`, `npm run build`, and `npm run phase8:sandbox-drill` after any change that touches checkout, payment, downloads, or admin actions.
+- Keep production-readiness notes grounded in the current codebase and local tooling that already exists, especially `npm run dev:tunnel`, `npm run dev:seed-assets`, and the signed-cookie admin bootstrap flow.
+
+Recommended implementation order for the next sessions:
+- Session 1: Remove any remaining placeholder or demo-only wording across storefront order, checkout, downloads, and admin screens so the UI consistently describes the current real flow.
+- Session 2: Polish the highest-friction UI states, especially submission pending states, gateway handoff failures, protected-download failure messaging, and admin action notices.
+- Session 3: Do a requirements and readiness review against the specification, then capture concrete version-1 limitations and operational caveats in project docs.
+- Session 4: Prepare the deployment and homelab handoff notes, including environment variables, startup order, payment callback routing expectations, storage requirements, and admin bootstrap steps.
+
+Phase 9 concrete completion checklist:
+- [ ] Replace stale wording that still implies future payment or download implementation rather than the current live flow.
+- [ ] Normalize user-facing copy around payment pending, paid, failed, cancelled, expired, and download entitlement states.
+- [ ] Review admin notices, form labels, and action feedback so product and order operations feel deliberate rather than scaffold-like.
+- [ ] Capture known version-1 limitations in one place, including guest checkout only, local callback tunneling requirements, and manual admin review constraints.
+- [ ] Produce a concise deployment or homelab runbook that matches the current repo scripts and environment variables.
+
+Phase 9 execution map:
+- Storefront copy and state pass:
+  - Target `src/app/checkout`, `src/app/order`, `src/app/downloads`, shared cart and checkout components, and any remaining success or failure banners.
+  - Remove wording that still sounds like mock checkout, sample payment handling, or placeholder download access.
+  - Make sure each order state tells the buyer what happened, what to do next, and whether email or page revisit is sufficient.
+- Admin UX pass:
+  - Target `src/app/admin/login`, `src/app/admin/products`, `src/app/admin/orders`, `src/app/admin/payments`, and any shared admin form or alert components.
+  - Replace generic scaffold labels, default action text, and ambiguous toast messages with operation-specific wording.
+  - Confirm that admin actions clearly distinguish publish versus archive, payment review versus order review, and successful save versus partial failure.
+- Requirements and limitation review pass:
+  - Compare the current implementation against `project-specification.md` and log only the gaps that still matter for MVP handoff.
+  - Prefer explicit limitation notes over speculative future-feature lists.
+  - Treat anything dependent on future customer accounts, automated refund handling, or richer entitlement lifecycle controls as version-2 scope unless the existing code already supports it.
+- Deployment and homelab pass:
+  - Ground all notes in the current repo scripts, `.env.example`, Prisma migration flow, protected storage path rules, and ToyyibPay callback expectations.
+  - Describe the minimum viable startup sequence so a fresh machine can reach catalog, checkout, callback, and protected-download readiness without tribal knowledge.
+
+Phase 9 acceptance gates:
+- `npm run lint` passes after every UI wording or component-state batch that changes rendered pages.
+- `npm run test` passes before closing the requirements and limitation review session.
+- `npm run build` passes before writing final deployment or homelab handoff notes.
+- `npm run phase8:sandbox-drill` is re-run after any change that could affect checkout submission, payment redirect handling, callback reconciliation, or protected downloads.
+- Visual review covers at least one paid-order path, one pending-order path, one failed-payment path, one invalid-download-token path, and one admin save flow.
+
+Session 1 working checklist:
+- [ ] Audit storefront and admin pages for placeholder, demo-only, or future-tense wording.
+- [ ] Replace stale copy in checkout, order success, payment pending, and download-access screens.
+- [ ] Tighten admin action notices, form helper text, and destructive-action confirmation wording.
+- [ ] Re-run `npm run lint` and `npm run build` after the copy cleanup batch.
+- [ ] Record the changed screens and any remaining UX friction in the progress log before moving to Session 2.
+
+Session 2 working checklist:
+- [ ] Improve loading, disabled, retry, and empty states for checkout submission and payment handoff.
+- [ ] Improve protected-download error messages for invalid, revoked, expired, or exhausted entitlements.
+- [ ] Improve admin feedback for product create, edit, publish, archive, and order-status actions.
+- [ ] Re-run `npm run lint`, `npm run build`, and `npm run phase8:sandbox-drill` if any checkout, payment, or download states changed.
+- [ ] Capture any intentionally deferred polish items so they do not get lost between sessions.
+
+Session 3 working checklist:
+- [ ] Review the live codebase against functional requirements in `project-specification.md`.
+- [ ] Write a single version-1 limitations section instead of scattering caveats across multiple docs.
+- [ ] Confirm which specification items are complete, partially complete, or intentionally deferred.
+- [ ] Re-run `npm run test` and resolve any regressions before documenting readiness conclusions.
+- [ ] Summarize the MVP readiness decision in terms of buyer flow, admin flow, and operational support burden.
+
+Session 4 working checklist:
+- [ ] Write the deployment or homelab runbook in the app repo docs.
+- [ ] Document required environment variables, database migration steps, storage preparation, and admin bootstrap steps.
+- [ ] Document the ToyyibPay callback routing requirement and the local tunnel expectation for development.
+- [ ] Document the operational smoke-test order after deployment, from catalog load through protected download.
+- [ ] Re-run `npm run build` and do one final document accuracy pass against the actual scripts and file paths.
+
+Draft version-1 limitations to validate during Session 3:
+- Guest checkout only; no customer account dashboard, passwordless re-entry flow, or purchase history lookup beyond entitlement links.
+- Payment success is callback-driven, so local development and some homelab scenarios depend on reachable public callback URLs.
+- Admin reconciliation remains partly manual for exceptional payment or fulfillment cases even though normal callbacks are automated.
+- The first release focuses on digital asset delivery and does not yet include refund automation, reseller workflows, or advanced entitlement revocation policies.
+- Operational email, buyer notifications, and production observability may still be minimal unless they already exist in the app repo by the time Session 3 starts.
+
+Draft deployment and homelab runbook outline:
+- Environment preparation: PostgreSQL availability, `.env` values, protected storage root, ToyyibPay sandbox or production credentials, and admin bootstrap secret values.
+- Application bootstrap: dependency install, Prisma generate, migration deploy, optional seed flow, optional asset seeding for local verification, and app startup commands.
+- Callback readiness: public callback URL strategy, `npm run dev:tunnel` expectations for development, and verification of return and callback endpoints.
+- Storage readiness: ensure product asset files exist under the protected storage root and are not served from the public web root.
+- Smoke test: load storefront, add a published product to cart, complete sandbox checkout, confirm paid state, and verify a protected asset download.
+
 ## Progress Log
 
 2026-05-02 - Created the initial development-start project plan based on the approved specification, schema, diagrams, and UI extraction plan.
@@ -195,13 +281,15 @@ Execution notes:
 2026-05-03 - Completed Phase 8 in `templatehub`, adding unit tests for checkout, payment, and admin decision logic plus integration tests for checkout creation, callback reconciliation, entitlement creation, protected downloads, duplicate callbacks, repeated fulfillment attempts, and index verification.
 2026-05-03 - Added the repeatable sandbox drill script `npm run phase8:sandbox-drill`, updated the root README, and documented the local Prisma, admin, protected storage, and ToyyibPay sandbox workflow in `docs/local-development.md`.
 2026-05-03 - Verified Phase 8 with `npm run test:unit`, `npm run test:integration`, `npm run lint`, `npm run build`, `npm run dev:seed-assets`, and a successful end-to-end sandbox purchase-to-download drill that reached a real ToyyibPay bill URL and a working protected download.
+2026-05-03 - Refined the Phase 9 handoff in this plan so the next sessions can execute polish, version-1 limitations, and MVP readiness work in a narrower and lower-risk sequence.
+2026-05-03 - Continued the Phase 9 planning detail with an execution map, per-session working checklists, acceptance gates, a draft version-1 limitations list, and a deployment or homelab runbook outline so the next implementation pass can start from concrete tasks instead of broad polish themes.
 
 ## Next Session Start Point
 
 - Continue in the app repo at `C:\Users\taufi\Documents\Dev\templatehub`.
-- Begin Phase 9 by reviewing the remaining demo-oriented text, placeholder assumptions, and operational rough edges across storefront and admin pages now that the core workflows and tests are live.
-- Refine the highest-friction loading, empty, success, and error states first, especially around admin actions, protected download failures, and payment handoff messaging.
-- Document the known version-1 limits next, including guest checkout constraints, manual admin review boundaries, and the current reliance on sandbox-style callback testing during local development.
-- Prepare the MVP handoff notes around deployment and homelab setup after the user-facing polish is complete.
+- Start with a focused Session 1 pass on copy and placeholder cleanup across checkout, order success, downloads, and admin pages so every visible message reflects the already-implemented live behavior.
+- After that, run a Session 2 UX polish pass on pending, failure, empty, and success states, prioritizing payment handoff messaging, protected-download failures, and admin action feedback.
+- Use Session 3 for a specification and readiness review, then write down concrete version-1 limitations and operational caveats instead of leaving them implicit.
+- Finish with Session 4 deployment and homelab handoff notes that match the current scripts, environment variables, protected storage path, callback tunnel expectations, and admin bootstrap flow.
 - Keep using `npm run dev:tunnel`, `npm run dev:seed-assets`, and `npm run phase8:sandbox-drill` whenever purchase-to-download regressions need to be rechecked during Phase 9 work.
 - Keep using auto-commit after each completed todo item.
