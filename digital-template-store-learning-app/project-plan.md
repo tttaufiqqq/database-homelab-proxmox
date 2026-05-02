@@ -45,12 +45,12 @@ App repo status in `C:\Users\taufi\Documents\Dev\templatehub`:
 - Admin routes already exist for login, products, product creation, product edit, and order review.
 - The checkout API now validates guest-cart payloads and persists orders, order items, and initial payment records.
 - API route files already exist for checkout, ToyyibPay bill creation, ToyyibPay return, ToyyibPay callback, and secure downloads.
-- Repository and service files now contain working product and checkout logic, while payment gateway and entitlement flows remain the main unfinished backend areas.
+- Repository and service files now contain working product, checkout, payment gateway, callback reconciliation, and entitlement creation logic.
 
 Important constraint for the next implementation pass:
-- Phase 3 and Phase 4 storefront work are now functionally in place, so the next working session should focus on replacing the current post-order stop with the real ToyyibPay bill creation and callback lifecycle.
-- Payment state transitions must remain idempotent and callback-driven even if the return URL is hit before the callback arrives.
-- The Phase 5 file structure already exists in `C:\Users\taufi\Documents\Dev\templatehub`, but the current `toyyibpay`, `payment-service`, `entitlement-service`, and payment route handlers are still placeholders returning stub responses or thrown errors.
+- Phase 5 is now functionally complete, including ToyyibPay sandbox bill creation, event persistence, callback-driven payment reconciliation, and one-time entitlement creation.
+- The next implementation pass should move into Phase 6 and replace the remaining protected-download placeholders with real entitlement-checked fulfillment.
+- Local sandbox payment testing now depends on the `npm run dev:tunnel` helper so ToyyibPay can reach a public callback URL during development.
 
 ## Implementation Plan
 
@@ -91,11 +91,11 @@ Execution notes:
 - [x] Add validation and error handling for unavailable products, invalid input, and empty carts.
 
 ### Phase 5: ToyyibPay Integration and Payment Processing
-- [ ] Implement the ToyyibPay sandbox client in `src/lib/payment/toyyibpay.ts`.
-- [ ] Build the create-bill server flow that generates a ToyyibPay bill and stores the returned bill code and payment URL.
-- [ ] Implement the return URL handler and the callback URL handler.
-- [ ] Persist all gateway payloads in `payment_events` and update payment state idempotently.
-- [ ] Mark orders as paid only after validated success and create download entitlements transactionally.
+- [x] Implement the ToyyibPay sandbox client in `src/lib/payment/toyyibpay.ts`.
+- [x] Build the create-bill server flow that generates a ToyyibPay bill and stores the returned bill code and payment URL.
+- [x] Implement the return URL handler and the callback URL handler.
+- [x] Persist all gateway payloads in `payment_events` and update payment state idempotently.
+- [x] Mark orders as paid only after validated success and create download entitlements transactionally.
 
 Execution notes:
 - Reuse the existing persisted order and payment records from Phase 4 instead of creating any duplicate payment bootstrap data in Phase 5.
@@ -113,21 +113,28 @@ Recommended implementation sequence:
 - Finish by replacing the `src/server/services/entitlement-service.ts` placeholder and connecting it only from the validated successful-payment branch.
 
 Phase 5 concrete completion checklist:
-- [ ] Add ToyyibPay environment parsing and outbound API request helpers.
-- [ ] Store `bill_code`, gateway reference data, payment URL, and bill creation timestamps on the existing payment record.
-- [ ] Persist raw create-bill, callback, and return payloads into `payment_events` with event type metadata.
-- [ ] Implement duplicate-safe payment reconciliation keyed by bill code, external transaction identifiers, and current payment state.
-- [ ] Create entitlements only once per paid order and link them back to the successful payment.
-- [ ] Redirect the buyer from checkout to ToyyibPay instead of directly landing on the local order success state.
-- [ ] Show pending, paid, failed, expired, and cancelled outcomes clearly in the storefront order flow.
-- [ ] Verify the full sandbox round-trip locally before moving on to broader fulfillment polish.
+- [x] Add ToyyibPay environment parsing and outbound API request helpers.
+- [x] Store `bill_code`, gateway reference data, payment URL, and bill creation timestamps on the existing payment record.
+- [x] Persist raw create-bill, callback, and return payloads into `payment_events` with event type metadata.
+- [x] Implement duplicate-safe payment reconciliation keyed by bill code, external transaction identifiers, and current payment state.
+- [x] Create entitlements only once per paid order and link them back to the successful payment.
+- [x] Redirect the buyer from checkout to ToyyibPay instead of directly landing on the local order success state.
+- [x] Show pending, paid, failed, expired, and cancelled outcomes clearly in the storefront order flow.
+- [x] Verify the full sandbox round-trip locally before moving on to broader fulfillment polish.
 
 ### Phase 6: Digital Fulfillment and Secure Downloads
-- [ ] Build the order success page and payment pending state page.
+- [x] Build the order success page and payment pending state page.
 - [ ] Build the protected downloads page using entitlement tokens.
 - [ ] Implement secure asset delivery outside the public web root.
 - [ ] Log download events and enforce entitlement checks before serving files.
 - [ ] Add failure handling for invalid, expired, revoked, or missing entitlements.
+
+Execution notes:
+- Reuse the entitlements created during Phase 5 instead of inventing a second fulfillment trigger or alternate access table.
+- Start with the protected downloads page and download API route so token validation, order context loading, and failure states are established before file streaming is added.
+- Keep product assets outside the public web root and resolve them from `STORAGE_ROOT` only after entitlement, status, and optional expiry checks pass.
+- Log every successful file delivery in `entitlement_download_logs`, including asset identity and lightweight request context where available.
+- Decide the first-pass download policy before implementation: unlimited active downloads versus enforcing `download_limit` once the admin tooling exists.
 
 ### Phase 7: Admin Operations and Content Management
 - [ ] Implement admin authentication and route protection.
@@ -172,16 +179,18 @@ Phase 5 concrete completion checklist:
 2026-05-03 - Verified the current app state repeatedly with `npm run lint` and `npm run build` after each major Phase 3 and Phase 4 milestone, leaving the `templatehub` worktree clean at the end of Phase 4.
 2026-05-03 - Audited the existing Phase 5 app files and confirmed that the payment integration remains scaffold-only: `src/lib/payment/toyyibpay.ts`, `src/server/services/payment-service.ts`, `src/server/services/entitlement-service.ts`, and the ToyyibPay route handlers are still placeholders.
 2026-05-03 - Expanded this plan with the concrete implementation sequence, completion checklist, and file ownership focus for the ToyyibPay bill creation, callback reconciliation, and entitlement pass.
+2026-05-03 - Completed Phase 5 in `templatehub`, including the ToyyibPay sandbox client, create-bill route, return and callback handlers, payment event persistence, callback-hash validation, idempotent payment reconciliation, and one-time entitlement creation.
+2026-05-03 - Verified the new payment lifecycle with `npm run prisma:generate`, `npm run lint`, `npm run build`, `npm run db:deploy`, a live ToyyibPay sandbox bill creation, a simulated successful callback, and a duplicate-callback entitlement check.
+2026-05-03 - Added the local sandbox callback helper `npm run dev:tunnel`, which generates `.env.development.local` with public HTTPS callback overrides so ToyyibPay can reach the local app during development.
+2026-05-03 - Updated the plan to close Phase 5 and shift the next implementation session to Phase 6 protected downloads and secure fulfillment.
 
 ## Next Session Start Point
 
 - Continue in the app repo at `C:\Users\taufi\Documents\Dev\templatehub`.
-- Begin Phase 5 by implementing the ToyyibPay sandbox client in `src/lib/payment/toyyibpay.ts`, including env parsing, bill payload construction, and normalized response handling.
-- Expand `src/server/repositories/payment-repository.ts` and `src/server/services/payment-service.ts` immediately after that so the create-bill, callback, and reconciliation flows share one payment-state mutation path.
-- Replace the current local-only order success stop with a real create-bill flow in `src/app/api/payment/toyyibpay/create-bill/route.ts` that updates the existing payment record and returns a ToyyibPay payment URL.
-- Implement `src/app/api/payment/toyyibpay/callback/route.ts` next, with callback processing treated as the source of truth for final payment state and entitlement triggering.
-- Implement `src/app/api/payment/toyyibpay/return/route.ts` after callback reconciliation is working, keeping it side-effect-light and focused on customer navigation or safe refresh behavior.
-- Persist gateway payloads to `payment_events` before marking payments paid, failed, expired, or cancelled.
-- Once payment status updates are idempotent, replace the `src/server/services/entitlement-service.ts` placeholder and create the entitlement generation step transactionally for successful payments.
-- Validate the full sandbox purchase flow with `npm run lint` and `npm run build` plus one real ToyyibPay sandbox round-trip before starting Phase 6.
+- Begin Phase 6 in `src/app/(storefront)/downloads/[token]/page.tsx` and `src/app/api/downloads/[token]/route.ts`, replacing both placeholders with entitlement-aware page loading and delivery logic.
+- Add a fulfillment read path that loads the entitlement, related order item, product, and active assets in one place before the page and API route diverge into presentation versus file response behavior.
+- Implement secure storage resolution from `STORAGE_ROOT`, keeping file access outside the public directory and rejecting invalid, revoked, expired, or missing entitlements before any file metadata or bytes are returned.
+- Record successful deliveries in `entitlement_download_logs` and update `download_count` transactionally alongside each file response.
+- After the protected download route works, refine the order success page so paid orders clearly surface entitlement destinations and any download policy or expiry details.
+- Keep using `npm run dev:tunnel` for local sandbox callback testing whenever payment-flow regressions need to be rechecked during Phase 6.
 - Keep using auto-commit after each completed todo item.
