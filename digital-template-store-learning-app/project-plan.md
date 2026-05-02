@@ -45,13 +45,14 @@ App repo status in `C:\Users\taufi\Documents\Dev\templatehub`:
 - Admin routes already exist for login, products, product creation, product edit, and order review.
 - The checkout API now validates guest-cart payloads and persists orders, order items, and initial payment records.
 - API route files already exist for checkout, ToyyibPay bill creation, ToyyibPay return, ToyyibPay callback, and secure downloads.
-- Repository and service files now contain working product, checkout, payment gateway, callback reconciliation, entitlement creation, protected download fulfillment, and admin operations logic.
+- Repository and service files now contain working product, checkout, payment gateway, callback reconciliation, entitlement creation, protected download fulfillment, admin operations, and automated Phase 8 verification logic.
 
 Important constraint for the next implementation pass:
 - Phase 5 is now functionally complete, including ToyyibPay sandbox bill creation, event persistence, callback-driven payment reconciliation, and one-time entitlement creation.
 - Phase 6 is now functionally complete, including entitlement-aware downloads page loading, secure storage-backed file delivery, and download logging.
 - Phase 7 is now functionally complete, including admin authentication, protected admin pages, product management, order review, payment event review, and audit logging for admin-side mutations.
-- The next implementation pass should move into Phase 8 so automated verification catches up with the now-working checkout, payment, fulfillment, and admin flows.
+- Phase 8 is now functionally complete, including unit tests, DB-backed integration workflow tests, index verification, updated local development documentation, and a repeatable sandbox drill script.
+- The next implementation pass should move into Phase 9 so the remaining polish, version-1 limitations, and MVP handoff concerns can be tightened around the now-working flows.
 - Local sandbox payment testing now depends on the `npm run dev:tunnel` helper so ToyyibPay can reach a public callback URL during development.
 
 ## Implementation Plan
@@ -146,11 +147,11 @@ Execution notes:
 - [x] Record admin actions in audit logs for product and order management operations.
 
 ### Phase 8: Testing, Reliability, and Homelab Readiness
-- [ ] Add integration tests for checkout, bill creation, callback handling, and entitlement creation.
-- [ ] Add regression tests for duplicate callbacks and repeated fulfillment attempts.
-- [ ] Verify indexes and query paths for product listing, order lookup, and token-based downloads.
-- [ ] Review and finalize `.env.example` and local development documentation for Prisma, PostgreSQL, and ToyyibPay sandbox setup.
-- [ ] Run an end-to-end sandbox payment drill and confirm that purchase-to-download works correctly.
+- [x] Add integration tests for checkout, bill creation, callback handling, and entitlement creation.
+- [x] Add regression tests for duplicate callbacks and repeated fulfillment attempts.
+- [x] Verify indexes and query paths for product listing, order lookup, and token-based downloads.
+- [x] Review and finalize `.env.example` and local development documentation for Prisma, PostgreSQL, and ToyyibPay sandbox setup.
+- [x] Run an end-to-end sandbox payment drill and confirm that purchase-to-download works correctly.
 
 ### Phase 9: Polish and MVP Handover
 - [ ] Replace any remaining demo-only template logic with production-oriented app flows.
@@ -191,13 +192,16 @@ Execution notes:
 2026-05-03 - Completed Phase 7 in `templatehub`, adding signed-cookie admin authentication, protected admin pages, product create/edit/publish/archive flows, admin order review updates, payment event inspection, and audit logging for product and order mutations.
 2026-05-03 - Added the new admin pages and actions in the app repo: `admin/login`, `admin/products`, `admin/products/new`, `admin/products/[id]/edit`, `admin/orders`, and `admin/payments`, plus the underlying auth and admin service layers.
 2026-05-03 - Verified the admin build with `npm run lint` and `npm run build`, confirming the protected admin routes compile cleanly alongside the storefront, payment, and fulfillment flows.
+2026-05-03 - Completed Phase 8 in `templatehub`, adding unit tests for checkout, payment, and admin decision logic plus integration tests for checkout creation, callback reconciliation, entitlement creation, protected downloads, duplicate callbacks, repeated fulfillment attempts, and index verification.
+2026-05-03 - Added the repeatable sandbox drill script `npm run phase8:sandbox-drill`, updated the root README, and documented the local Prisma, admin, protected storage, and ToyyibPay sandbox workflow in `docs/local-development.md`.
+2026-05-03 - Verified Phase 8 with `npm run test:unit`, `npm run test:integration`, `npm run lint`, `npm run build`, `npm run dev:seed-assets`, and a successful end-to-end sandbox purchase-to-download drill that reached a real ToyyibPay bill URL and a working protected download.
 
 ## Next Session Start Point
 
 - Continue in the app repo at `C:\Users\taufi\Documents\Dev\templatehub`.
-- Begin Phase 8 by adding integration coverage around checkout, ToyyibPay bill creation, callback reconciliation, entitlement creation, and protected download delivery.
-- Add regression coverage for duplicate callbacks, repeated fulfillment attempts, and admin-side product or order updates that should preserve existing payment and entitlement invariants.
-- Review the current Prisma query paths and indexes for product listing, order lookup, payment-event inspection, and token-based download access now that the end-to-end flows are live.
-- Expand the local documentation next, especially around admin bootstrap access, `npm run dev:tunnel`, `npm run dev:seed-assets`, and the recommended sandbox payment test sequence.
-- Keep using `npm run dev:tunnel` and `npm run dev:seed-assets` whenever purchase-to-download or admin-ops regressions need to be rechecked during Phase 8 work.
+- Begin Phase 9 by reviewing the remaining demo-oriented text, placeholder assumptions, and operational rough edges across storefront and admin pages now that the core workflows and tests are live.
+- Refine the highest-friction loading, empty, success, and error states first, especially around admin actions, protected download failures, and payment handoff messaging.
+- Document the known version-1 limits next, including guest checkout constraints, manual admin review boundaries, and the current reliance on sandbox-style callback testing during local development.
+- Prepare the MVP handoff notes around deployment and homelab setup after the user-facing polish is complete.
+- Keep using `npm run dev:tunnel`, `npm run dev:seed-assets`, and `npm run phase8:sandbox-drill` whenever purchase-to-download regressions need to be rechecked during Phase 9 work.
 - Keep using auto-commit after each completed todo item.
