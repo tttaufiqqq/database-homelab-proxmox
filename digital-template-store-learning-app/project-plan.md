@@ -45,11 +45,12 @@ App repo status in `C:\Users\taufi\Documents\Dev\templatehub`:
 - Admin routes already exist for login, products, product creation, product edit, and order review.
 - The checkout API now validates guest-cart payloads and persists orders, order items, and initial payment records.
 - API route files already exist for checkout, ToyyibPay bill creation, ToyyibPay return, ToyyibPay callback, and secure downloads.
-- Repository and service files now contain working product, checkout, payment gateway, callback reconciliation, and entitlement creation logic.
+- Repository and service files now contain working product, checkout, payment gateway, callback reconciliation, entitlement creation, and protected download fulfillment logic.
 
 Important constraint for the next implementation pass:
 - Phase 5 is now functionally complete, including ToyyibPay sandbox bill creation, event persistence, callback-driven payment reconciliation, and one-time entitlement creation.
-- The next implementation pass should move into Phase 6 and replace the remaining protected-download placeholders with real entitlement-checked fulfillment.
+- Phase 6 is now functionally complete, including entitlement-aware downloads page loading, secure storage-backed file delivery, and download logging.
+- The next implementation pass should move into Phase 7 so admin authentication and operational review pages can catch up with the now-working storefront purchase lifecycle.
 - Local sandbox payment testing now depends on the `npm run dev:tunnel` helper so ToyyibPay can reach a public callback URL during development.
 
 ## Implementation Plan
@@ -124,10 +125,10 @@ Phase 5 concrete completion checklist:
 
 ### Phase 6: Digital Fulfillment and Secure Downloads
 - [x] Build the order success page and payment pending state page.
-- [ ] Build the protected downloads page using entitlement tokens.
-- [ ] Implement secure asset delivery outside the public web root.
-- [ ] Log download events and enforce entitlement checks before serving files.
-- [ ] Add failure handling for invalid, expired, revoked, or missing entitlements.
+- [x] Build the protected downloads page using entitlement tokens.
+- [x] Implement secure asset delivery outside the public web root.
+- [x] Log download events and enforce entitlement checks before serving files.
+- [x] Add failure handling for invalid, expired, revoked, or missing entitlements.
 
 Execution notes:
 - Reuse the entitlements created during Phase 5 instead of inventing a second fulfillment trigger or alternate access table.
@@ -183,14 +184,16 @@ Execution notes:
 2026-05-03 - Verified the new payment lifecycle with `npm run prisma:generate`, `npm run lint`, `npm run build`, `npm run db:deploy`, a live ToyyibPay sandbox bill creation, a simulated successful callback, and a duplicate-callback entitlement check.
 2026-05-03 - Added the local sandbox callback helper `npm run dev:tunnel`, which generates `.env.development.local` with public HTTPS callback overrides so ToyyibPay can reach the local app during development.
 2026-05-03 - Updated the plan to close Phase 5 and shift the next implementation session to Phase 6 protected downloads and secure fulfillment.
+2026-05-03 - Completed Phase 6 in `templatehub`, replacing the protected-download placeholders with entitlement-aware page loading, secure download delivery, storage-path validation, failure states, download-count enforcement, and delivery logging in `entitlement_download_logs`.
+2026-05-03 - Added the local helper `npm run dev:seed-assets` so development placeholder files can be generated under protected storage and the download flow can be exercised without manual file setup.
+2026-05-03 - Verified the fulfillment flow with `npm run dev:seed-assets`, `npm run lint`, `npm run build`, a protected-download smoke test against a paid entitlement, and a database check confirming the new download log row and `download_count` increment.
 
 ## Next Session Start Point
 
 - Continue in the app repo at `C:\Users\taufi\Documents\Dev\templatehub`.
-- Begin Phase 6 in `src/app/(storefront)/downloads/[token]/page.tsx` and `src/app/api/downloads/[token]/route.ts`, replacing both placeholders with entitlement-aware page loading and delivery logic.
-- Add a fulfillment read path that loads the entitlement, related order item, product, and active assets in one place before the page and API route diverge into presentation versus file response behavior.
-- Implement secure storage resolution from `STORAGE_ROOT`, keeping file access outside the public directory and rejecting invalid, revoked, expired, or missing entitlements before any file metadata or bytes are returned.
-- Record successful deliveries in `entitlement_download_logs` and update `download_count` transactionally alongside each file response.
-- After the protected download route works, refine the order success page so paid orders clearly surface entitlement destinations and any download policy or expiry details.
-- Keep using `npm run dev:tunnel` for local sandbox callback testing whenever payment-flow regressions need to be rechecked during Phase 6.
+- Begin Phase 7 by implementing admin authentication and route protection around the existing admin pages, keeping storefront guest checkout separate from admin access control.
+- Expand the admin products flow after auth so product creation, editing, publishing, archiving, and asset-linking workflows can manage the now-live fulfillment paths.
+- Build the admin orders and payment-events pages next so paid, pending, failed, and callback-received orders can be reviewed without direct database access.
+- Add audit logging around the admin-side product and order management actions once the main admin mutations are wired.
+- Keep using `npm run dev:tunnel` and `npm run dev:seed-assets` whenever storefront purchase-to-download regressions need to be rechecked during Phase 7 work.
 - Keep using auto-commit after each completed todo item.
