@@ -1,30 +1,17 @@
 # Database Homelab
 
-This repository documents a PostgreSQL-focused database infrastructure homelab running on a Proxmox VM. The goal is to learn database operations properly first, then use that foundation to support your own applications.
+This repository documents a PostgreSQL-focused homelab running on a Proxmox VM. It is structured as a multi-domain database learning hub: DBA first, then database programming, database engineering, data warehousing, business intelligence, and real application integration.
 
-The lab is built around:
-
-- a hardened Ubuntu server in Proxmox
-- PostgreSQL as the main learning platform
-- hands-on DBA exercises mapped from Oracle concepts to PostgreSQL
-- documentation-first notes with real commands, results, and operational scenarios
-
----
+The homelab is also paired with `TemplateHub`, a real application project used to simulate how PostgreSQL is operated inside an industry-style workflow.
 
 ## What this repo is
 
-This is not a traditional application repository.
-
-It is a:
+This is not a traditional application repository. It is a:
 
 - lab notebook
 - operations workbook
-- infrastructure learning record
+- database learning knowledge base
 - reference set for future database experiments
-
-The files here capture what was tested on the real server, what the expected behavior was, and what actually happened.
-
----
 
 ## Current environment
 
@@ -41,7 +28,7 @@ The files here capture what was tested on the real server, what the expected beh
 - OS: Ubuntu 24.04.4 LTS
 - PostgreSQL: 16.x
 
-### Access model
+### Current access model
 
 - SSH key authentication
 - SSH password login disabled
@@ -51,55 +38,36 @@ The files here capture what was tested on the real server, what the expected beh
 - pgAdmin currently connects directly to `100.75.213.36:5432`
 - `taufiq_dba` is used as the daily remote admin login for PostgreSQL
 
----
+### Associated application
 
-## Repository structure
+- app name: `TemplateHub`
+- purpose: simulate a real production-style application using PostgreSQL
+- local app codebase: `C:\Users\taufi\Documents\Dev\templatehub`
+- planning/docs reference in this repo: [TemplateHub docs](/C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/index.md)
+- GitHub repository: [tttaufiqqq/templatehub](https://github.com/tttaufiqqq/templatehub)
 
-### Core infrastructure docs
+## Documentation map
 
-- [taufiq-db-server-hardening.md](C:/Users/taufi/Documents/Dev/database/taufiq-db-server-hardening.md)  
-  SSH hardening, Tailscale setup, and firewall restrictions.
+- [Foundation](/C:/Users/taufi/Documents/Dev/database/docs/01-foundation/index.md)
+  Architecture, hardening, connectivity, and baseline homelab setup.
+- [DBA Track](/C:/Users/taufi/Documents/Dev/database/docs/02-dba/index.md)
+  The current deepest track: instance management, storage, roles, locking, maintenance, performance, backups, recovery, and data movement.
+- [Database Programming](/C:/Users/taufi/Documents/Dev/database/docs/03-database-programming/index.md)
+  Reserved for SQL, PL/pgSQL, triggers, procedures, and transaction logic.
+- [Database Engineering](/C:/Users/taufi/Documents/Dev/database/docs/04-database-engineering/index.md)
+  Reserved for schema design, indexing, migrations, query tuning, reliability, and production-style data architecture.
+- [App Integration](/C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/index.md)
+  Application-facing database usage, currently centered on `TemplateHub`.
+- [Sessions](/C:/Users/taufi/Documents/Dev/database/docs/06-sessions/index.md)
+  Dated work logs and environment snapshots.
+- [Data Warehousing](/C:/Users/taufi/Documents/Dev/database/docs/07-data-warehousing/index.md)
+  Reserved for dimensional modeling, ETL/ELT, analytical storage patterns, and warehouse-oriented performance.
+- [Business Intelligence](/C:/Users/taufi/Documents/Dev/database/docs/08-business-intelligence/index.md)
+  Reserved for metrics, dashboards, reporting models, analytical SQL, and decision-support thinking.
 
-- [database-homelab-architecture.md](C:/Users/taufi/Documents/Dev/database/database-homelab-architecture.md)  
-  Recommended target architecture for this hardware, including VM sizing, network layout, and phased build order.
+## Current learning focus
 
-- [connect-pgadmin.md](C:/Users/taufi/Documents/Dev/database/connect-pgadmin.md)  
-  How pgAdmin is connected now over Tailscale, plus the SSH tunnel fallback method.
-
-### Session and lab docs
-
-- [lab-session-2026-05-02.md](C:/Users/taufi/Documents/Dev/database/lab-session-2026-05-02.md)  
-  Initial environment discovery and Oracle-to-PostgreSQL architecture mapping.
-
-- [lab-lec4-instance.md](C:/Users/taufi/Documents/Dev/database/lab-lec4-instance.md)  
-  Lecture 4 lab template for database instance management.
-
-- [lab-lec4-instance-completed.md](C:/Users/taufi/Documents/Dev/database/lab-lec4-instance-completed.md)  
-  Completed Lecture 4 lab with observed outputs and notes.
-
-- [lab-lec5-storage.md](C:/Users/taufi/Documents/Dev/database/lab-lec5-storage.md)  
-  Lecture 5 lab template for storage structures.
-
-- [lab-lec5-storage-completed.md](C:/Users/taufi/Documents/Dev/database/lab-lec5-storage-completed.md)  
-  Completed Lecture 5 lab with storage hierarchy and file mapping.
-
-- [lab-lec6-users.md](C:/Users/taufi/Documents/Dev/database/lab-lec6-users.md)  
-  Lecture 6 lab template for users, roles, and privileges.
-
-- [lab-lec6-users-completed.md](C:/Users/taufi/Documents/Dev/database/lab-lec6-users-completed.md)  
-  Completed Lecture 6 lab with user security and privilege tests.
-
-- [lab-lec7-locking.md](C:/Users/taufi/Documents/Dev/database/lab-lec7-locking.md)  
-  Lecture 7 lab template for concurrency and locking.
-
-- [lab-lec7-locking-completed.md](C:/Users/taufi/Documents/Dev/database/lab-lec7-locking-completed.md)  
-  Completed Lecture 7 lab with blocking, deadlocks, and session control.
-
----
-
-## Learning focus
-
-This homelab is currently focused on:
+The lab is currently focused most heavily on DBA work:
 
 - PostgreSQL internals and operations
 - Oracle concept mapping for learning
@@ -108,49 +76,35 @@ This homelab is currently focused on:
 - storage structures
 - logging and observability
 - locking and concurrency behavior
+- backup, recovery, and performance drills
 
-Planned next areas:
+Planned expansion areas:
 
-- backup and restore drills
-- monitoring stack
-- streaming replication
+- database programming patterns in PostgreSQL
+- deeper database engineering and schema evolution
+- data warehousing design and ETL/ELT workflows
+- business intelligence modeling, metrics, and reporting
+- monitoring stack and replication
 - failover exercises
-- attaching real applications
-
----
-
-## Current implemented access model
-
-The current live access model is:
-
-- `22/tcp` allowed on `tailscale0`
-- `5432/tcp` allowed on `tailscale0`
-- PostgreSQL listening on `127.0.0.1` and `100.75.213.36`
-- `pg_hba.conf` allowing Tailscale clients via `scram-sha-256`
-- pgAdmin connecting directly to `100.75.213.36:5432`
-- `taufiq_dba` used as the daily superuser/admin role
-
-This means the lab has moved from localhost-only PostgreSQL administration to a real private-network database service model inside Tailscale.
-
----
+- operating `TemplateHub` through least-privilege database roles
 
 ## Recommended reading order
 
 If you are starting fresh in this repo, read in this order:
 
-1. [database-homelab-architecture.md](C:/Users/taufi/Documents/Dev/database/database-homelab-architecture.md)
-2. [taufiq-db-server-hardening.md](C:/Users/taufi/Documents/Dev/database/taufiq-db-server-hardening.md)
-3. [lab-session-2026-05-02.md](C:/Users/taufi/Documents/Dev/database/lab-session-2026-05-02.md)
-4. the `*-completed.md` lab files in lecture order
+1. [Homelab Architecture](/C:/Users/taufi/Documents/Dev/database/docs/01-foundation/homelab-architecture.md)
+2. [Server Hardening](/C:/Users/taufi/Documents/Dev/database/docs/01-foundation/server-hardening.md)
+3. [Initial Lab Session](/C:/Users/taufi/Documents/Dev/database/docs/06-sessions/2026-05-02-initial-lab-session.md)
+4. [DBA Track Index](/C:/Users/taufi/Documents/Dev/database/docs/02-dba/index.md)
+5. [TemplateHub Integration](/C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/index.md)
 
 That gives you:
 
 - the target design
 - the security baseline
 - the current environment state
-- the completed practical exercises
-
----
+- the hands-on DBA path
+- the real application context
 
 ## Philosophy
 
@@ -162,21 +116,18 @@ The approach is:
 - document everything important
 - verify behavior with live commands
 - practice recovery, not just setup
-- connect real apps only after the database foundation is solid
-
----
+- expand from DBA fundamentals into programming, engineering, warehousing, BI, and app integration
 
 ## Near-term roadmap
 
 The next strong milestones for this repo are:
 
-1. Backup and restore guide with tested recovery steps
-2. Monitoring setup for PostgreSQL metrics and dashboards
-3. Replica VM build and streaming replication notes
-4. Failover drill documentation
-5. One app integrated against a least-privilege PostgreSQL role
-
----
+1. Add more index pages for new learning domains as they become active.
+2. Continue backup and restore verification with clearer runbooks.
+3. Add monitoring setup for PostgreSQL metrics and dashboards.
+4. Start the data warehousing and BI sections with core modeling notes and example exercises.
+5. Add replica and failover documentation.
+6. Harden and document `TemplateHub` integration against a least-privilege PostgreSQL role.
 
 ## Notes
 

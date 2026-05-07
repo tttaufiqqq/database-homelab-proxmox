@@ -143,9 +143,9 @@ Tablespace (pg_default)
 ## Next Steps
 
 See individual lecture lab files for hands-on exercises:
-- `lab-lec4-instance.md`
-- `lab-lec5-storage.md`
-- `lab-lec6-users.md`
-- `lab-lec7-locking.md`
-- `lab-lec8-undo.md`
-- `lab-lec9-audit-maintenance.md`
+- [Lecture 4: Instance Management](C:/Users/taufi/Documents/Dev/database/docs/02-dba/01-instance-management/lecture-04-instance-management.md)
+- [Lecture 5: Storage Structures](C:/Users/taufi/Documents/Dev/database/docs/02-dba/02-storage-structures/lecture-05-storage-structures.md)
+- [Lecture 6: Users and Security](C:/Users/taufi/Documents/Dev/database/docs/02-dba/03-users-and-security/lecture-06-users-and-security.md)
+- [Lecture 7: Locking and Concurrency](C:/Users/taufi/Documents/Dev/database/docs/02-dba/04-locking-and-concurrency/lecture-07-locking-and-concurrency.md)
+- [Lecture 8: Undo and Transactions](C:/Users/taufi/Documents/Dev/database/docs/02-dba/05-undo-and-transactions/lecture-08-undo-and-transactions.md)
+- [Lecture 9: Audit and Maintenance](C:/Users/taufi/Documents/Dev/database/docs/02-dba/06-audit-and-maintenance/lecture-09-audit-and-maintenance.md)

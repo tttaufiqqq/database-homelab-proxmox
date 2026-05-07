@@ -1,0 +1,15 @@
+# DBA Track
+
+This is the current primary track for the homelab. Each topic folder keeps the lab template and the completed run together.
+
+- [Instance Management](C:/Users/taufi/Documents/Dev/database/docs/02-dba/01-instance-management/lecture-04-instance-management.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/01-instance-management/lecture-04-instance-management-completed.md)
+- [Storage Structures](C:/Users/taufi/Documents/Dev/database/docs/02-dba/02-storage-structures/lecture-05-storage-structures.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/02-storage-structures/lecture-05-storage-structures-completed.md)
+- [Users and Security](C:/Users/taufi/Documents/Dev/database/docs/02-dba/03-users-and-security/lecture-06-users-and-security.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/03-users-and-security/lecture-06-users-and-security-completed.md)
+- [Locking and Concurrency](C:/Users/taufi/Documents/Dev/database/docs/02-dba/04-locking-and-concurrency/lecture-07-locking-and-concurrency.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/04-locking-and-concurrency/lecture-07-locking-and-concurrency-completed.md)
+- [Undo and Transactions](C:/Users/taufi/Documents/Dev/database/docs/02-dba/05-undo-and-transactions/lecture-08-undo-and-transactions.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/05-undo-and-transactions/lecture-08-undo-and-transactions-completed.md)
+- [Audit and Maintenance](C:/Users/taufi/Documents/Dev/database/docs/02-dba/06-audit-and-maintenance/lecture-09-audit-and-maintenance.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/06-audit-and-maintenance/lecture-09-audit-and-maintenance-completed.md)
+- [Performance Management](C:/Users/taufi/Documents/Dev/database/docs/02-dba/07-performance-management/lecture-10-performance-management.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/07-performance-management/lecture-10-performance-management-completed.md)
+- [Backup and Recovery Concepts](C:/Users/taufi/Documents/Dev/database/docs/02-dba/08-backup-and-recovery-concepts/lecture-11-backup-and-recovery-concepts.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/08-backup-and-recovery-concepts/lecture-11-backup-and-recovery-concepts-completed.md)
+- [Backups](C:/Users/taufi/Documents/Dev/database/docs/02-dba/09-backups/lecture-12-backups.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/09-backups/lecture-12-backups-completed.md)
+- [Recovery](C:/Users/taufi/Documents/Dev/database/docs/02-dba/10-recovery/lecture-13-recovery.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/10-recovery/lecture-13-recovery-completed.md)
+- [Data Movement](C:/Users/taufi/Documents/Dev/database/docs/02-dba/11-data-movement/lecture-14-moving-data.md) and [completed notes](C:/Users/taufi/Documents/Dev/database/docs/02-dba/11-data-movement/lecture-14-moving-data-completed.md)
