@@ -45,14 +45,72 @@ But it does **not** protect against full host failure.
 
 ## Current actual deployment
 
-Right now your real database environment is:
+**Last updated: 2026-05-11**
 
-- Proxmox VM name: `db-server`
-- guest hostname: `taufiq-db`
-- current role in practice: main PostgreSQL server
-- current access pattern: pgAdmin connects directly over Tailscale to `100.75.213.36:5432`
+The homelab now has two active VMs and two live deployed applications.
 
-So in today’s setup, `db-server` is the only real database VM and it is acting as your primary PostgreSQL server.
+### Active VMs
+
+| VM name | Guest hostname | Tailscale IP | Role | RAM |
+|---|---|---|---|---|
+| `db-server` | `taufiq-db` | `100.75.213.36` | PostgreSQL 16 primary | 2 GiB |
+| `app-server` | `taufiq-app-server` | `100.97.172.9` | Docker host, Cloudflare Tunnel | 2 GiB |
+
+Both VMs are connected to each other via Tailscale. The app server reaches PostgreSQL at `100.75.213.36:5432`.
+
+```
+Internet
+    │
+    ▼
+Cloudflare Edge  (free HTTPS, DDoS protection)
+    │  cloudflared systemd service
+    ▼
+taufiq-app-server  100.97.172.9
+  ├── templatehub        :3000 ──► templatehub.tttaufiqqq.com
+  ├── admin-templatehub  :3001 ──► admin.tttaufiqqq.com
+  └── watchtower              ──► polls ghcr.io every 300s
+    │
+    │  Tailscale
+    ▼
+taufiq-db  100.75.213.36
+  └── PostgreSQL 16  :5432
+```
+
+### Running containers on app-server
+
+| Container | Image | Host port | Public URL |
+|---|---|---|---|
+| `templatehub` | `ghcr.io/tttaufiqqq/templatehub:latest` | 3000 | templatehub.tttaufiqqq.com |
+| `admin-templatehub` | `ghcr.io/tttaufiqqq/admin-templatehub:latest` | 3001 | admin.tttaufiqqq.com |
+| `watchtower` | `containrrr/watchtower` | — | auto-deploys on new image push |
+
+Both apps share the same PostgreSQL database (`templatehub`) on `taufiq-db`.
+
+### CI/CD pipeline
+
+Push to GitHub → GitHub Actions builds Docker image → pushes to ghcr.io → Watchtower polls every 300s → auto-redeploys.
+
+```mermaid
+sequenceDiagram
+    participant Dev as Dev PC
+    participant GH as GitHub
+    participant GA as GitHub Actions
+    participant Reg as ghcr.io
+    participant WT as Watchtower
+    participant App as taufiq-app-server
+
+    Dev->>GH: git push (master/main)
+    GH->>GA: trigger workflow
+    GA->>GA: docker build (node:20-alpine, standalone)
+    GA->>Reg: push :latest image
+    WT->>Reg: poll every 300s
+    Reg-->>WT: new digest available
+    WT->>App: docker pull + restart container
+```
+
+### Cloudflare tunnel
+
+Public HTTPS routing without opening any ports. Tunnel runs as a systemd service on app-server, routes both subdomains to their respective container ports.
 
 ---
 
@@ -406,18 +464,52 @@ This homelab is successful if you can comfortably do the following without guess
 
 ---
 
+## Planned next VMs (from homelab projects roadmap)
+
+These VMs are planned but not yet created. Pre-work: resize both existing VMs from 2 GiB → 1 GiB each (actual usage is ~380 MB) before adding new ones.
+
+| VM / LXC | Type | RAM | Role | Phase |
+|---|---|---|---|---|
+| `taufiq-db-replica` | VM | 1 GiB | PostgreSQL streaming replica | Phase 1 |
+| `taufiq-vault` | VM | 512 MB | HashiCorp Vault (secrets management) | Phase 2 |
+| `taufiq-monitoring` | LXC | 512 MB | Prometheus + Grafana + Loki | Phase 3 |
+| `taufiq-backup` | LXC | 128 MB | pg_dump cron + restore drills | Phase 4 |
+
+Total projected: ~5 GiB / 7.6 GiB with ballooning enabled.
+
+```mermaid
+graph TD
+    Internet --> CF[Cloudflare Edge]
+    CF -->|tunnel| App[taufiq-app-server\n100.97.172.9]
+
+    App -->|Tailscale| DB[taufiq-db\nPostgreSQL primary\n100.75.213.36]
+    App -->|Tailscale - Phase 1| Replica[taufiq-db-replica\nStreaming replica]
+    App -->|Tailscale - Phase 2| Vault[taufiq-vault\nHashiCorp Vault]
+    App -->|Tailscale - Phase 3| Mon[taufiq-monitoring\nPrometheus + Grafana + Loki]
+
+    DB -->|WAL streaming| Replica
+    DB -->|pg_dump - Phase 4| Backup[taufiq-backup\nBackup pipeline]
+    Replica -->|PITR source| Backup
+
+    style DB fill:#2d6a4f,color:#fff
+    style App fill:#1d3557,color:#fff
+    style Replica fill:#457b9d,color:#fff
+    style Vault fill:#6d4c41,color:#fff
+    style Mon fill:#6a0572,color:#fff
+    style Backup fill:#b5451b,color:#fff
+```
+
 ## Recommended next step
 
-Start with **one excellent PostgreSQL primary VM** and make it boringly reliable before adding the replica.
+**Phase 1: PostgreSQL streaming replication.**
 
-That means:
+The primary is stable and has a real app workload (TemplateHub). The natural next step is adding `taufiq-db-replica` and configuring WAL streaming replication. This directly supports the DBA curriculum (replica setup, failover drills) and gives TemplateHub read scaling + backup-from-replica capability.
 
-1. finalize hardening
-2. standardize your PostgreSQL config and roles
-3. document backup and restore
-4. only then build replication
-
-That sequence will teach you more than jumping straight into HA tooling.
+Pre-work before creating the replica VM:
+1. Resize `taufiq-app-server` RAM: 2 GiB → 1 GiB (shutdown required)
+2. Resize `taufiq-db` RAM: 2 GiB → 1 GiB (shutdown required)
+3. Verify both VMs stable after resize
+4. Then create `taufiq-db-replica`
 
 ---
 
