@@ -3,7 +3,7 @@
 ## 1. Source Template
 
 Source folder:
-[ecommerce-app-frontend-template](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/ecommerce-app-frontend-template)
+[ecommerce-app-frontend-template](ecommerce-app-frontend-template)
 
 ## 2. Goal
 

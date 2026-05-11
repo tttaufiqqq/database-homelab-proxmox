@@ -143,9 +143,9 @@ Tablespace (pg_default)
 ## Next Steps
 
 See individual lecture lab files for hands-on exercises:
-- [Lecture 4: Instance Management](C:/Users/taufi/Documents/Dev/database/docs/02-dba/01-instance-management/lecture-04-instance-management.md)
-- [Lecture 5: Storage Structures](C:/Users/taufi/Documents/Dev/database/docs/02-dba/02-storage-structures/lecture-05-storage-structures.md)
-- [Lecture 6: Users and Security](C:/Users/taufi/Documents/Dev/database/docs/02-dba/03-users-and-security/lecture-06-users-and-security.md)
-- [Lecture 7: Locking and Concurrency](C:/Users/taufi/Documents/Dev/database/docs/02-dba/04-locking-and-concurrency/lecture-07-locking-and-concurrency.md)
-- [Lecture 8: Undo and Transactions](C:/Users/taufi/Documents/Dev/database/docs/02-dba/05-undo-and-transactions/lecture-08-undo-and-transactions.md)
-- [Lecture 9: Audit and Maintenance](C:/Users/taufi/Documents/Dev/database/docs/02-dba/06-audit-and-maintenance/lecture-09-audit-and-maintenance.md)
+- [Lecture 4: Instance Management](../02-dba/01-instance-management/worksheet.md)
+- [Lecture 5: Storage Structures](../02-dba/02-storage-structures/worksheet.md)
+- [Lecture 6: Users and Security](../02-dba/03-users-and-security/worksheet.md)
+- [Lecture 7: Locking and Concurrency](../02-dba/04-locking-and-concurrency/worksheet.md)
+- [Lecture 8: Undo and Transactions](../02-dba/05-undo-and-transactions/worksheet.md)
+- [Lecture 9: Audit and Maintenance](../02-dba/06-audit-and-maintenance/worksheet.md)

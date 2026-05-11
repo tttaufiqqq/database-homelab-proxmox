@@ -783,12 +783,12 @@ templatehub/
 
 The diagrams for this project are separated into individual Markdown files:
 
-- [Context Diagram](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/context-diagram.md)
-- [Data Flow Diagram Level 0](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/data-flow-diagram-level-0.md)
-- [Use Case Diagram](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/use-case-diagram.md)
-- [Activity Diagram](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/activity-diagram-checkout-payment.md)
-- [ERD Diagram](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/erd-diagram.md)
-- [UI Template Extraction Plan](C:/Users/taufi/Documents/Dev/database/docs/05-app-integration/templatehub/planning/ui-template-extraction-plan.md)
+- [Context Diagram](context-diagram.md)
+- [Data Flow Diagram Level 0](data-flow-diagram-level-0.md)
+- [Use Case Diagram](use-case-diagram.md)
+- [Activity Diagram](activity-diagram-checkout-payment.md)
+- [ERD Diagram](erd-diagram.md)
+- [UI Template Extraction Plan](ui-template-extraction-plan.md)
 
 ## 10. Suggested Next Build Steps
 
