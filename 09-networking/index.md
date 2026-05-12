@@ -15,8 +15,26 @@ Each module pairs theory with a concrete task on the lab. Concepts first, then h
 | 03 | VLANs & Network Segmentation | ✅ Complete |
 | 04 | Linux Routing & Firewalling (on Proxmox host) | ✅ Complete |
 | 05 | DNS — Internal Name Resolution | ✅ Complete |
-| 06 | Reverse Proxy — Nginx | Planned |
-| 07 | Load Balancing — HAProxy | Planned |
+| 06 | Reverse Proxy — Nginx | ✅ Complete |
+| 07 | Load Balancing — HAProxy | Skipped — optional, not applicable to single-server setup |
+| **— Phase 1: LAN Layer 2 —** | | |
+| 08 | Ethernet Frames & MAC Tables | Planned |
+| 09 | ARP Deep Dive | Planned |
+| 10 | DHCP Deep Dive | Planned |
+| 11 | STP & Loop Prevention | Planned — Packet Tracer |
+| 12 | 802.1Q Frame-Level | Planned |
+| 13 | Link Aggregation & Bonding | Planned |
+| **— Phase 2: LAN/WAN Boundary —** | | |
+| 14 | NAT Deep Dive | Planned |
+| 15 | WAN Fundamentals & ISP Architecture | Planned |
+| **— Phase 3: WAN —** | | |
+| 16 | WAN Emulation with `tc` | Planned |
+| 17 | Tunneling: GRE & IPIP | Planned |
+| 18 | WireGuard from Scratch | Planned |
+| 19 | BGP with FRRouting | Planned |
+| **— Phase 4: Advanced & Security —** | | |
+| 20 | pfSense as Router & Firewall | Planned |
+| 21 | Network Security | Planned |
 
 ---
 
