@@ -28,17 +28,13 @@ graph TD
     CF -->|tunnel| App[taufiq-app-server\n100.97.172.9]
 
     App -->|Tailscale| DB[taufiq-db\nPostgreSQL primary\n100.75.213.36]
-    App -->|Tailscale - Phase 1| Replica[taufiq-db-replica\nStreaming replica]
-    App -->|Tailscale - Phase 2| Vault[taufiq-vault\nHashiCorp Vault]
-    App -->|Tailscale - Phase 3| Mon[taufiq-monitoring\nPrometheus + Grafana + Loki]
+    App -->|Tailscale - Phase 1| Vault[taufiq-vault\nHashiCorp Vault]
+    App -->|Tailscale - Phase 2| Mon[taufiq-monitoring\nPrometheus + Grafana + Loki]
 
-    DB -->|WAL streaming| Replica
-    DB -->|pg_dump - Phase 4| Backup[taufiq-backup\nBackup pipeline]
-    Replica -->|PITR source| Backup
+    DB -->|pg_dump - Phase 3| Backup[taufiq-backup\nBackup pipeline]
 
     style DB fill:#2d6a4f,color:#fff
     style App fill:#1d3557,color:#fff
-    style Replica fill:#457b9d,color:#fff
     style Vault fill:#6d4c41,color:#fff
     style Mon fill:#6a0572,color:#fff
     style Backup fill:#b5451b,color:#fff
@@ -52,18 +48,37 @@ graph TD
 |---|---|---|---|---|---|
 | taufiq-app-server | VM | 1 GiB | 1 core | 10 GiB | Resize from 2 GiB |
 | taufiq-db | VM | 1 GiB | 1 core | 20 GiB | Resize from 2 GiB |
-| taufiq-db-replica | VM | 1 GiB | 1 core | 20 GiB | New — Phase 1 |
-| taufiq-vault | VM | 512 MB | 1 core | 8 GiB | New — Phase 2 |
-| taufiq-monitoring | LXC | 512 MB | 1 core | 10 GiB | New — Phase 3 |
-| taufiq-backup | LXC | 128 MB | 1 core | 5 GiB | New — Phase 4 |
+| taufiq-vault | VM | 512 MB | 1 core | 8 GiB | New — Phase 1 |
+| taufiq-monitoring | LXC | 512 MB | 1 core | 10 GiB | New — Phase 2 |
+| taufiq-backup | LXC | 128 MB | 1 core | 5 GiB | New — Phase 3 |
 | Proxmox host overhead | — | ~800 MB | — | — | — |
-| **Total** | | **~5 GiB / 7.6 GiB** | | **~73 GiB** | 2.6 GiB free |
+| **Total** | | **~4 GiB / 7.6 GiB** | | **~53 GiB** | 3.6 GiB free |
 
 Enable **memory ballooning** on all VMs — idle VMs release RAM back to the host. Ubuntu/Debian have `virtio-balloon` built in.
 
 **VM vs LXC reasoning:**
 - DB replica and Vault → full VMs (data integrity, security isolation)
 - Monitoring and Backup → LXC (single-purpose, lightweight, non-sensitive)
+
+---
+
+## Networking Track
+
+Running in parallel with the VM phases. Learn concepts, then apply directly to Proxmox.
+
+See full curriculum: [09-networking/index.md](09-networking/index.md)
+
+| Module | Topic | Status |
+|---|---|---|
+| 01 | IP Addressing & Subnetting | Concepts done — apply pending |
+| 02 | Proxmox Networking Internals | Planned |
+| 03 | VLANs & Network Segmentation | Planned |
+| 04 | pfSense — Firewall & Router | Planned |
+| 05 | DNS — Internal Name Resolution | Planned |
+| 06 | Reverse Proxy — Nginx | Planned |
+| 07 | Load Balancing — HAProxy | Planned |
+
+**Recommended start:** Module 02 (audit current Proxmox interfaces) → Module 03 (VLANs) → Module 04 (pfSense).
 
 ---
 
@@ -75,42 +90,7 @@ Enable **memory ballooning** on all VMs — idle VMs release RAM back to the hos
 
 ---
 
-## Phase 1 — PostgreSQL Replication
-
-**Goal:** Real-time streaming replica of the primary. Directly supports TemplateHub HA + DBA curriculum.
-**New VM:** `taufiq-db-replica` — 1 GiB RAM, 1 core, 20 GiB, Ubuntu 24.04
-
-```
-taufiq-db (primary)
-    │  WAL stream
-    ▼
-taufiq-db-replica (replica — read-only mirror)
-```
-
-**Benefits for TemplateHub:**
-- Promote replica if primary crashes (high availability)
-- Read-only queries (product catalog, order history) hit replica instead of primary
-- Dump backups from replica — zero impact on live app
-
-**Checklist:**
-- [ ] Create taufiq-db-replica VM
-- [ ] Install Ubuntu 24.04 + Tailscale
-- [ ] Install PostgreSQL 16
-- [ ] Create replication role on primary
-- [ ] Configure `pg_hba.conf` on primary to allow replica connection
-- [ ] Configure `postgresql.conf` on primary (`wal_level`, `max_wal_senders`)
-- [ ] Run `pg_basebackup` to initialise replica
-- [ ] Start replica and verify WAL streaming
-- [ ] Confirm replica is syncing (`pg_stat_replication`)
-- [ ] Test read-only query on replica
-- [ ] Test failover — promote replica to primary
-- [ ] Rebuild old primary as new replica (optional)
-
-**Skills learned:** Streaming replication, WAL, pg_basebackup, failover promotion, read/write splitting
-
----
-
-## Phase 2 — HashiCorp Vault (Secrets Management)
+## Phase 1 — HashiCorp Vault (Secrets Management)
 
 **Goal:** Replace `.env` files on app-server with runtime secret fetching. Every secret access is logged.
 **New VM:** `taufiq-vault` — 512 MB RAM, 1 core, 8 GiB, Ubuntu 24.04
@@ -151,7 +131,7 @@ vault/
 
 ---
 
-## Phase 3 — Observability Stack
+## Phase 2 — Observability Stack
 
 **Goal:** Visibility into app behaviour and database health. Essential before handling real traffic at volume.
 **New LXC:** `taufiq-monitoring` — 512 MB RAM, 1 core, 10 GiB
@@ -166,7 +146,7 @@ vault/
 | Payment callback success/failure | App metrics |
 | Protected download request volume | App metrics |
 | PostgreSQL query performance | postgres_exporter |
-| Replication lag (once Phase 1 done) | postgres_exporter |
+| PostgreSQL replication lag (if applicable) | postgres_exporter |
 | App server CPU + memory | Node exporter |
 | Cloudflare Tunnel connection health | cloudflared metrics |
 
@@ -188,7 +168,7 @@ vault/
 
 ---
 
-## Phase 4 — PostgreSQL Backup Pipeline
+## Phase 3 — PostgreSQL Backup Pipeline
 
 **Goal:** Automated, verified backups with documented restore procedures. A backup never restored is not a backup.
 **New LXC:** `taufiq-backup` — 128 MB RAM, 1 core, 5 GiB
@@ -214,7 +194,6 @@ Log result → Loki
 
 **Backup types:**
 - Full backup — complete `pg_dump` daily
-- Point-in-time recovery — WAL archiving from replica (Phase 1 required)
 - Retention policy — 7 daily, 4 weekly, 3 monthly
 
 **Checklist:**
@@ -225,10 +204,9 @@ Log result → Loki
 - [ ] Implement retention policy (7/4/3)
 - [ ] Test restore drill — dump into a fresh DB, verify data integrity
 - [ ] Document restore runbook clearly
-- [ ] Connect backup logs to Loki (Phase 3 required)
-- [ ] Set up WAL archiving from replica for PITR
+- [ ] Connect backup logs to Loki (Phase 2 required)
 
-**Skills learned:** pg_dump, WAL archiving, PITR, restore drills, retention policies, cron pipelines
+**Skills learned:** pg_dump, restore drills, retention policies, cron pipelines
 
 ---
 
@@ -236,11 +214,9 @@ Log result → Loki
 
 | Project | What | Why |
 |---|---|---|
-| K3s Kubernetes | Replace Docker with lightweight K8s | Most in-demand infra skill, translates to EKS/GKE/AKS |
 | Apache Kafka | Message streaming broker | Core data engineering tool |
 | k6 Load Testing | Simulate concurrent buyers on TemplateHub | Capacity planning, DB connection pool tuning |
 | Gitea + Woodpecker | Self-hosted Git + CI/CD | Learn how CI/CD infrastructure is built |
-| Service Mesh (Linkerd) | Mutual TLS, traffic management | Advanced enterprise networking |
 
 ---
 
@@ -251,20 +227,17 @@ Pre-work (now)
   └── Resize VMs: 2 GiB → 1 GiB each
 
 Phase 1 (next)
-  └── PostgreSQL streaming replication (taufiq-db-replica)
-
-Phase 2
   └── HashiCorp Vault (taufiq-vault)
   └── Migrate TemplateHub secrets off .env
 
-Phase 3
+Phase 2
   └── Observability stack (taufiq-monitoring)
   └── Prometheus + Grafana + Loki
 
-Phase 4
+Phase 3
   └── Backup pipeline (taufiq-backup)
   └── Restore drills
 
-Phase 5+
-  └── K3s, Kafka, load testing, service mesh
+Phase 4+
+  └── Kafka, load testing, self-hosted CI/CD
 ```

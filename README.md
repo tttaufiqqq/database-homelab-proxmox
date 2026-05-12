@@ -1,6 +1,6 @@
 # Database Homelab
 
-A PostgreSQL-focused homelab running on Proxmox VE. Structured as a multi-domain database learning hub: DBA first, then database programming, database engineering, data warehousing, business intelligence, and real application integration.
+A PostgreSQL + Networking homelab running on Proxmox VE. Structured as a multi-domain learning hub: DBA fundamentals, networking implementation (subnetting, VLANs, pfSense, DNS, reverse proxy), database programming, and real application integration.
 
 Paired with **TemplateHub** — a real Next.js + Prisma application deployed to the homelab app server, used to simulate production-style PostgreSQL operations.
 
@@ -31,6 +31,7 @@ See [Homelab Architecture](01-foundation/homelab-architecture.md) and [Homelab R
 - [Sessions](06-sessions/index.md) — Dated work logs and environment snapshots *(active)*
 - [Data Warehousing](07-data-warehousing/index.md) — Dimensional modeling, ETL/ELT *(reserved)*
 - [Business Intelligence](08-business-intelligence/index.md) — Metrics, dashboards, analytical SQL *(reserved)*
+- [Networking](09-networking/index.md) — Subnetting, VLANs, pfSense, DNS, reverse proxy, load balancing *(active)*
 
 ## Recommended reading order
 
@@ -42,21 +43,23 @@ See [Homelab Architecture](01-foundation/homelab-architecture.md) and [Homelab R
 
 ## Current learning focus
 
-The lab is currently focused on DBA work:
+Two tracks running in parallel:
 
+**DBA track:**
 - PostgreSQL internals and operations
-- Server hardening and access control
-- Storage structures, locking, concurrency
 - Backup, recovery, and performance drills
 - Real application integration (TemplateHub on app-server)
 
+**Networking track:**
+- Subnetting concepts done — applying the 10.0.x.x scheme to Proxmox
+- VLANs, pfSense firewall/router, DNS, reverse proxy
+
 ## Near-term roadmap
 
-1. PostgreSQL streaming replication (taufiq-db-replica VM)
+1. Networking — audit Proxmox interfaces, enable VLANs, pfSense setup
 2. HashiCorp Vault for secrets management
 3. Observability stack (Prometheus + Grafana + Loki)
 4. pg_dump backup pipeline with retention and restore drills
-5. Least-privilege PostgreSQL role for TemplateHub
 
 ## Philosophy
 

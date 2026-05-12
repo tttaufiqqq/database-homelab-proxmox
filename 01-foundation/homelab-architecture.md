@@ -470,12 +470,11 @@ These VMs are planned but not yet created. Pre-work: resize both existing VMs fr
 
 | VM / LXC | Type | RAM | Role | Phase |
 |---|---|---|---|---|
-| `taufiq-db-replica` | VM | 1 GiB | PostgreSQL streaming replica | Phase 1 |
-| `taufiq-vault` | VM | 512 MB | HashiCorp Vault (secrets management) | Phase 2 |
-| `taufiq-monitoring` | LXC | 512 MB | Prometheus + Grafana + Loki | Phase 3 |
-| `taufiq-backup` | LXC | 128 MB | pg_dump cron + restore drills | Phase 4 |
+| `taufiq-vault` | VM | 512 MB | HashiCorp Vault (secrets management) | Phase 1 |
+| `taufiq-monitoring` | LXC | 512 MB | Prometheus + Grafana + Loki | Phase 2 |
+| `taufiq-backup` | LXC | 128 MB | pg_dump cron + restore drills | Phase 3 |
 
-Total projected: ~5 GiB / 7.6 GiB with ballooning enabled.
+Total projected: ~4 GiB / 7.6 GiB with ballooning enabled.
 
 ```mermaid
 graph TD
@@ -483,17 +482,13 @@ graph TD
     CF -->|tunnel| App[taufiq-app-server\n100.97.172.9]
 
     App -->|Tailscale| DB[taufiq-db\nPostgreSQL primary\n100.75.213.36]
-    App -->|Tailscale - Phase 1| Replica[taufiq-db-replica\nStreaming replica]
-    App -->|Tailscale - Phase 2| Vault[taufiq-vault\nHashiCorp Vault]
-    App -->|Tailscale - Phase 3| Mon[taufiq-monitoring\nPrometheus + Grafana + Loki]
+    App -->|Tailscale - Phase 1| Vault[taufiq-vault\nHashiCorp Vault]
+    App -->|Tailscale - Phase 2| Mon[taufiq-monitoring\nPrometheus + Grafana + Loki]
 
-    DB -->|WAL streaming| Replica
-    DB -->|pg_dump - Phase 4| Backup[taufiq-backup\nBackup pipeline]
-    Replica -->|PITR source| Backup
+    DB -->|pg_dump - Phase 3| Backup[taufiq-backup\nBackup pipeline]
 
     style DB fill:#2d6a4f,color:#fff
     style App fill:#1d3557,color:#fff
-    style Replica fill:#457b9d,color:#fff
     style Vault fill:#6d4c41,color:#fff
     style Mon fill:#6a0572,color:#fff
     style Backup fill:#b5451b,color:#fff
@@ -501,15 +496,15 @@ graph TD
 
 ## Recommended next step
 
-**Phase 1: PostgreSQL streaming replication.**
+**Pre-work + Phase 1: HashiCorp Vault.**
 
-The primary is stable and has a real app workload (TemplateHub). The natural next step is adding `taufiq-db-replica` and configuring WAL streaming replication. This directly supports the DBA curriculum (replica setup, failover drills) and gives TemplateHub read scaling + backup-from-replica capability.
+The primary is stable and has a real app workload (TemplateHub). Pre-work: resize both VMs from 2 GiB → 1 GiB (actual usage is ~380 MB each). Then create `taufiq-vault` and migrate TemplateHub secrets off `.env` files.
 
-Pre-work before creating the replica VM:
+Pre-work:
 1. Resize `taufiq-app-server` RAM: 2 GiB → 1 GiB (shutdown required)
 2. Resize `taufiq-db` RAM: 2 GiB → 1 GiB (shutdown required)
 3. Verify both VMs stable after resize
-4. Then create `taufiq-db-replica`
+4. Then create `taufiq-vault`
 
 ---
 
@@ -518,9 +513,9 @@ Pre-work before creating the replica VM:
 For your current Proxmox hardware, the best database homelab is:
 
 - one main PostgreSQL VM
-- one small replica VM later
-- one lightweight ops node
+- secrets management with HashiCorp Vault
+- observability with Prometheus + Grafana + Loki
+- automated backup pipeline with restore drills
 - strong documentation
-- repeated backup, restore, and failure drills
 
 This keeps the lab realistic, teaches the right fundamentals, and gives you a strong base for eventually hosting your own apps on top of it.
