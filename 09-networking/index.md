@@ -14,7 +14,7 @@ Each module pairs theory with a concrete task on the lab. Concepts first, then h
 | 02 | Proxmox Networking Internals | ✅ Complete |
 | 03 | VLANs & Network Segmentation | ✅ Complete |
 | 04 | Linux Routing & Firewalling (on Proxmox host) | ✅ Complete |
-| 05 | DNS — Internal Name Resolution | Planned |
+| 05 | DNS — Internal Name Resolution | ✅ Complete |
 | 06 | Reverse Proxy — Nginx | Planned |
 | 07 | Load Balancing — HAProxy | Planned |
 
@@ -167,7 +167,7 @@ Routing rules on Proxmox host:
 - [ ] Verify: `dig taufiq-db.lab` resolves correctly from app-server
 - [ ] Replace Tailscale IP references in app configs with `.lab` hostnames
 
-**Worksheets:** [worksheet.md](05-dns/worksheet.md) — *pending*
+**Worksheets:** [worksheet.md](05-dns/worksheet.md) | [completed.md](05-dns/completed.md)
 
 ---
 

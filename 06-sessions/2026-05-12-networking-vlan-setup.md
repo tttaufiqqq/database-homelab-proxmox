@@ -118,10 +118,40 @@ Note: default FORWARD policy left as ACCEPT — scoped DROP rules used instead t
 
 ---
 
-## What is still not done (next sessions)
+## Module 05 — DNS Internal Name Resolution (completed same session)
 
-### Module 05 — DNS
-VMs still refer to each other by IP. Once the network is stable, set up internal DNS so `taufiq-db.lab` resolves to `10.0.30.20`. This decouples configs from IPs.
+bind9 installed on taufiq-db as authoritative nameserver for `homelab.lab`. Both VMs configured to use it via systemd-resolved.
+
+### Zone records
+
+| Hostname | IP |
+|----------|----|
+| taufiq-db.homelab.lab | 10.0.30.20 |
+| taufiq-app-server.homelab.lab | 10.0.20.102 |
+| proxmox.homelab.lab | 192.168.0.10 |
+
+### Additional firewall rules required
+
+Two layers opened for DNS (port 53 UDP+TCP):
+- iptables FORWARD on Proxmox host — inserted before catch-all DROP
+- UFW on taufiq-db — allow from 10.0.20.0/24
+
+### Tests
+
+```bash
+# From taufiq-app-server:
+dig taufiq-db.homelab.lab +short        # 10.0.30.20  ✅
+dig taufiq-app-server.homelab.lab +short # 10.0.20.102 ✅
+dig proxmox.homelab.lab +short          # 192.168.0.10 ✅
+dig google.com +short                   # 172.217.x.x  ✅ (forwarding works)
+
+# From taufiq-db:
+dig taufiq-app-server.homelab.lab +short # 10.0.20.102 ✅
+```
+
+---
+
+## What is still not done (next sessions)
 
 ### Module 06 — Reverse proxy
 Nginx as internal reverse proxy for Vault UI, Grafana, pgAdmin — accessible by subdomain without going through Cloudflare.
